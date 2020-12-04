@@ -1,4 +1,12 @@
+
 (require '[clojure.string :as str])
+
+(defn xor
+  [a b]
+  (or (and a (not b))
+      (and (not a) b)))
+
+
 
 (defn parse-line
   "Create data structure for singular spec + password combo"
@@ -13,21 +21,23 @@
 
 
 (defn isValidPassword?
-  [{low :low
-    high :high
+  [{ind1 :low
+    ind2 :high
     policyChar :char
     password :password}]
-  (let [freqs (frequencies password)
-        count (or (get freqs (first policyChar)) 0)]
-    (<= low count high)))
+  (let [value1 (get password (dec ind1))
+        value2 (get password (dec ind2))]
+    (xor
+     (= value1 (first policyChar))
+     (= value2 (first policyChar)))))
 
 (defn read-lines [filename]
   "Convert file to clojure data structure"
-    (with-open [rdr (clojure.java.io/reader filename)]
-      (->> rdr
-           line-seq
-           (map #(parse-line %))
-           (vec))))
+  (with-open [rdr (clojure.java.io/reader filename)]
+    (->> rdr
+         line-seq
+         (map #(parse-line %))
+         (vec))))
 
 
 (let [lines (read-lines "input.txt")]
