@@ -1,5 +1,6 @@
 (ns boarding
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [clojure.set :as set]))
 
 
 (defn raw->lines
@@ -20,6 +21,15 @@
                   :colMin 0
                   :numCol 8})
 
+(defn reducePossibilities
+  [ranges letter]
+  (case letter
+    \F (assoc ranges :numRows (/ (:numRows ranges) 2))
+    \B (assoc ranges :rowMin (+ (:rowMin ranges) (/ (:numRows ranges) 2)) :numRows (/ (:numRows ranges) 2))
+    \L (assoc ranges :numCol (/ (:numCol ranges) 2))
+    \R (assoc ranges :colMin (+ (:colMin ranges) (/ (:numCol ranges) 2)) :numCol (/ (:numCol ranges) 2))))
+
+
 (defn parseSeatSpec
   ([spec]
    (parseSeatSpec spec initialRanges))
@@ -29,14 +39,6 @@
      (parseSeatSpec
       (rest spec)
       (reducePossibilities ranges (first spec))))))
-
-(defn reducePossibilities
-  [ranges letter]
-  (case letter
-    \F (assoc ranges :numRows (/ (:numRows ranges) 2))
-    \B (assoc ranges :rowMin (+ (:rowMin ranges) (/ (:numRows ranges) 2)) :numRows (/ (:numRows ranges) 2))
-    \L (assoc ranges :numCol (/ (:numCol ranges) 2))
-    \R (assoc ranges :colMin (+ (:colMin ranges) (/ (:numCol ranges) 2)) :numCol (/ (:numCol ranges) 2))))
 
 (defn getSeatID
   [ranges]
@@ -51,3 +53,27 @@
                    parseSeatSpec
                    getSeatID)
               data)))
+
+
+;;Solve p2
+
+(def maxID (+ (* 127 8) 7))
+(def seats
+  (map #(-> %
+            parseSeatSpec
+            getSeatID)
+       data))
+
+(def missingSeats
+  (set/difference (set (range 0 1023)) (set seats)))
+
+(defn filter-front
+  [missing]
+  (let [sorted (sort-by identity missing)] ;; Sort list
+    (loop [prev -1
+           currList sorted]
+      (if (= (inc prev) (first currList))
+        (recur (first currList) (rest currList))
+        (first currList)))))
+
+(filter-front missingSeats)
