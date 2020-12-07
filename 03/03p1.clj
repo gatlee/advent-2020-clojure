@@ -67,3 +67,12 @@
   []
   (countTrees (getDiagonals (create-map "input.txt") 3 1)))
 
+
+(defn solve-p2
+  []
+  (let
+      [slopes [[1 1] [3 1] [5 1] [7 1] [1 2]]
+       tiles (create-map "input.txt")]
+    (->> slopes
+         (map #(countTrees (apply getDiagonals tiles %)))
+         (apply *))))
