@@ -1,5 +1,6 @@
 (ns advent.06
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [clojure.set :as set]))
 
 
 (def data
@@ -10,8 +11,19 @@
   [s]
   (count (set (s/replace s "\n" ""))))
 
-(defn solve
+
+(defn count-intersection
+  [s]
+  (count (apply set/intersection (map set (s/split s #"\n")))))
+
+(defn solve-p1
   []
   (apply +  (map count-unique data)))
 
-(solve)
+(defn solve-p2
+  []
+  (apply + (map count-intersection data)))
+
+
+(solve-p1)
+(solve-p2)
