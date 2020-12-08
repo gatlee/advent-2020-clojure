@@ -1,8 +1,5 @@
 (ns luggage
   (:require [clojure.string :as s]))
-(def line "light red bags contain 1 bright white bag, 2 muted yellow bags.")
-(def empty "faded blue bags contain no other bags.")
-
 
 (def data
   (-> (slurp "input.txt")
@@ -11,7 +8,6 @@
       (s/replace #"\d " "")
       (s/split-lines)))
 
-data
 (defn add-entry
   [dict line]
   (let [[outer & inner] (s/split line #"(\.|, |\scontain\s)")]
@@ -40,8 +36,6 @@ data
 
 
 (def bagMap (generate-map data))
-
-(contains-gold? "shiny gold" bagMap)
 
 (def memo-contains-gold? (memoize contains-gold?))
 
